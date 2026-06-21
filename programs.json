@@ -1,0 +1,95 @@
+{
+  "updated": "2026-01-15",
+  "programs": [
+    {
+      "id": "cs",
+      "name": "Computer Science",
+      "school": "Engineering & Natural Sciences",
+      "degree": "Bachelor of Science",
+      "duration": "4 years",
+      "language": "English",
+      "tagline": "Software systems, algorithms and the foundations of AI."
+    },
+    {
+      "id": "math",
+      "name": "Mathematics & Applications",
+      "school": "Engineering & Natural Sciences",
+      "degree": "Bachelor of Science",
+      "duration": "4 years",
+      "language": "English",
+      "tagline": "AI foundations, scientific computing and financial mathematics."
+    },
+    {
+      "id": "ecs",
+      "name": "Embedded Computing Systems",
+      "school": "Engineering & Natural Sciences",
+      "degree": "Master of Science",
+      "duration": "2 years",
+      "language": "English",
+      "tagline": "Hardware-software co-design for real-time and IoT systems."
+    },
+    {
+      "id": "mgmt",
+      "name": "Management",
+      "school": "Business & Economics",
+      "degree": "Bachelor of Science",
+      "duration": "4 years",
+      "language": "English",
+      "tagline": "Leadership, strategy and operations for global organizations."
+    },
+    {
+      "id": "fim",
+      "name": "Finance & Information Management",
+      "school": "Business & Economics",
+      "degree": "Master of Science",
+      "duration": "2 years",
+      "language": "English",
+      "tagline": "Where financial decision-making meets data and information systems."
+    },
+    {
+      "id": "design",
+      "name": "Design",
+      "school": "Design",
+      "degree": "Bachelor of Design",
+      "duration": "4 years",
+      "language": "English / Georgian",
+      "tagline": "Product, visual and spatial design grounded in research."
+    },
+    {
+      "id": "law",
+      "name": "Law",
+      "school": "Law & Social Sciences",
+      "degree": "Bachelor of Law",
+      "duration": "4 years",
+      "language": "English / Georgian",
+      "tagline": "Georgian and international legal systems in practice."
+    },
+    {
+      "id": "psych",
+      "name": "Psychology",
+      "school": "Law & Social Sciences",
+      "degree": "Bachelor's Degree",
+      "duration": "4 years",
+      "language": "English / Georgian",
+      "tagline": "Human behaviour, cognition and applied research methods."
+    },
+    {
+      "id": "ipie",
+      "name": "Intellectual Property, Innovation & Entrepreneurship",
+      "school": "Law & Social Sciences",
+      "degree": "Master's Degree",
+      "duration": "2 years",
+      "language": "English",
+      "tagline": "Turning research and ideas into protected, fundable ventures."
+    },
+    {
+      "id": "med",
+      "name": "Medicine",
+      "school": "Medicine",
+      "degree": "Single-Cycle Program",
+      "duration": "6 years",
+      "language": "English / Georgian",
+      "tagline": "A clinical and research track supported by KIU's hadron-therapy centre."
+    }
+  ]
+}

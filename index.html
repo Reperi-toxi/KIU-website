@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kutaisi International University · Student Project</title>
+<meta name="description" content="An unofficial student project showcasing Kutaisi International University — schools, programs, admissions and live campus data.">
+
+<link rel="icon" type="image/x-icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxWV88BhwhSdlmSDiK9H4lv324l1ZtFcfjA8CBHDAcgG1kZK_E48v7x3MP&s=10">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============ DEMO BANNER ============ -->
+<div class="demo-banner">
+  This is an unofficial student coding project about KIU — not affiliated with the university. Forms and data stay in your browser. Visit the
+  <a href="https://www.kiu.edu.ge/" target="_blank" rel="noopener">official KIU site</a>.
+</div>
+
+<!-- ============ HEADER / NAV ============ -->
+<header class="site-header" id="siteHeader">
+  <div class="nav-wrap">
+    <a class="brand" href="#top">
+      <span class="brand-mark">KIU</span>
+      <span class="brand-full">Kutaisi International<br>University</span>
+    </a>
+
+    <nav class="nav-links" id="navLinks">
+      <a href="#schools">Schools</a>
+      <a href="#milestones">Milestones</a>
+      <a href="#admission">Admission</a>
+      <a href="#favorites">My&nbsp;List <span class="nav-badge" id="favCount">0</span></a>
+      <a href="#partnership">Partners</a>
+    </nav>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ HERO + CAMPUS PULSE (signature element) ============ -->
+  <section class="hero" id="top">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Kutaisi International University · Est. 2020</p>
+        <h1 class="hero-title">Hic Scientia<br>Futūrum Creat</h1>
+        <p class="hero-sub">"Where knowledge creates the future"</p>
+        <p class="hero-text">
+          KIU opened to its first cohort in 2020 as Georgia's newest public university, built on a 150-hectare
+          forested campus outside Kutaisi. Its operating model and curricula are developed in partnership with the
+          <strong>Technical University of Munich (TUM)</strong>, with TUM's former president serving as KIU's
+          honorary president — backed by a multi-decade investment from the Cartu Foundation.
+        </p>
+        <div class="hero-actions">
+          <a href="#schools" class="btn btn-gold">Explore Schools</a>
+          <a href="#admission" class="btn btn-outline">Start an Application</a>
+        </div>
+      </div>
+
+      <aside class="pulse-card" aria-label="Live campus dashboard">
+        <div class="pulse-head">
+          <span class="pulse-dot" id="pulseDot"></span>
+          <span>CAMPUS PULSE</span>
+        </div>
+
+        <div class="pulse-row">
+          <span class="pulse-label">Kutaisi local time</span>
+          <span class="pulse-value" id="pulseClock">--:--:--</span>
+        </div>
+
+        <div class="pulse-row">
+          <span class="pulse-label">Campus weather</span>
+          <span class="pulse-value" id="pulseWeather">fetching…</span>
+        </div>
+
+        <div class="pulse-row">
+          <span class="pulse-label">Visitors on this device</span>
+          <span class="pulse-value" id="pulseVisits">—</span>
+        </div>
+
+        <div class="pulse-divider"></div>
+
+        <p class="pulse-fact-label">Did you know</p>
+        <p class="pulse-fact" id="pulseFact">&nbsp;</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ STATS BAND ============ -->
+  <section class="stats-band" id="statsBand">
+    <div class="stat">
+      <span class="stat-num" data-target="2020" id="statFounded">0</span>
+      <span class="stat-label">Founded</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" data-target="150" id="statCampus">0</span>
+      <span class="stat-label">Hectares of campus</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" data-target="5" id="statSchools">0</span>
+      <span class="stat-label">Schools</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" data-target="10" id="statPrograms">0</span>
+      <span class="stat-label">Degree programs</span>
+    </div>
+  </section>
+
+  <!-- ============ SCHOOLS & PROGRAMS ============ -->
+  <section class="programs" id="schools">
+    <div class="section-head">
+      <p class="eyebrow">Academic Offer</p>
+      <h2>Schools &amp; Programs</h2>
+      <p>Loaded live from KIU's program catalogue (JSON). Search, filter by school, and save the ones you're
+        considering — your list is kept on this device.</p>
+    </div>
+
+    <div class="programs-controls">
+      <input type="search" id="programSearch" class="program-search" placeholder="Search programs, e.g. &quot;Computer Science&quot;" aria-label="Search programs">
+      <div class="filter-chips" id="filterChips"></div>
+    </div>
+
+    <div class="programs-grid" id="programsGrid">
+      <p class="programs-status" id="programsStatus">Loading the program catalogue…</p>
+    </div>
+    <p class="programs-empty" id="programsEmpty" hidden>No programs match your search. Try another term or school.</p>
+  </section>
+
+  <!-- ============ MILESTONES ============ -->
+  <section class="timeline" id="milestones">
+    <div class="section-head">
+      <p class="eyebrow">A Young University, Moving Fast</p>
+      <h2>Milestones</h2>
+    </div>
+
+    <ol class="timeline-list">
+      <li class="timeline-item">
+        <span class="timeline-year">2020</span>
+        <div class="timeline-body">
+          <h3>First cohort enrolls</h3>
+          <p>KIU opens its doors on the new Kutaisi campus, becoming a Legal Entity of Public Law — a Georgian state university.</p>
+        </div>
+      </li>
+      <li class="timeline-item">
+        <span class="timeline-year">2020–</span>
+        <div class="timeline-body">
+          <h3>TUM partnership begins</h3>
+          <p>The operating model and academic programs are co-developed with the Technical University of Munich and TUM International GmbH. Prof. Dr. Wolfgang A. Herrmann, TUM's former president, becomes KIU's honorary president.</p>
+        </div>
+      </li>
+      <li class="timeline-item">
+        <span class="timeline-year">2020–</span>
+        <div class="timeline-body">
+          <h3>Cartu Foundation investment</h3>
+          <p>The Cartu Foundation commits long-term funding toward building KIU into a regional hub for education, science and technology.</p>
+        </div>
+      </li>
+      <li class="timeline-item">
+        <span class="timeline-year">2025</span>
+        <div class="timeline-body">
+          <h3>Ten degree programs</h3>
+          <p>The academic offer grows to ten English- and Georgian-taught programs across five schools, from Computer Science to Medicine.</p>
+        </div>
+      </li>
+      <li class="timeline-item">
+        <span class="timeline-year">Today</span>
+        <div class="timeline-body">
+          <h3>Research infrastructure online</h3>
+          <p>Facilities including a hadron-therapy and cyclotron centre support physics, biophysics and radiochemistry research alongside a student-run innovation ecosystem.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ ADMISSION ============ -->
+  <section class="admission" id="admission">
+    <div class="section-head">
+      <p class="eyebrow">Admission</p>
+      <h2>Start an Application</h2>
+      <p>A practice application flow — it simulates a real network submission with a short delay, then saves to
+        your device so you can review or remove it any time.</p>
+    </div>
+
+    <div class="admission-grid">
+      <form class="admission-form" id="admissionForm" novalidate>
+        <label class="field">
+          <span>Full name</span>
+          <input type="text" name="fullName" id="fullName" required placeholder="e.g. Nina Beridze">
+        </label>
+
+        <label class="field">
+          <span>Email</span>
+          <input type="email" name="email" id="email" required placeholder="you@example.com">
+        </label>
+
+        <label class="field">
+          <span>Program</span>
+          <select name="program" id="programSelect" required>
+            <option value="" disabled selected>Loading programs…</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Intake</span>
+          <select name="intake" id="intake" required>
+            <option value="Autumn 2026">Autumn 2026</option>
+            <option value="Spring 2027">Spring 2027</option>
+            <option value="Autumn 2027">Autumn 2027</option>
+          </select>
+        </label>
+
+        <label class="field field-wide">
+          <span>Anything we should know?</span>
+          <textarea name="message" id="message" rows="3" placeholder="Optional note about your background or questions"></textarea>
+        </label>
+
+        <button type="submit" class="btn btn-gold" id="submitBtn">
+          <span id="submitBtnText">Submit application</span>
+        </button>
+        <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+      </form>
+
+      <div class="admission-list">
+        <h3>Your saved applications</h3>
+        <ul id="applicationsList" class="applications-list"></ul>
+        <p class="applications-empty" id="applicationsEmpty">You haven't started an application yet — it'll show up here once you submit the form.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAVORITES ============ -->
+  <section class="favorites" id="favorites">
+    <div class="section-head">
+      <p class="eyebrow">Saved For Later</p>
+      <h2>My List</h2>
+    </div>
+    <div class="favorites-grid" id="favoritesGrid"></div>
+    <p class="favorites-empty" id="favoritesEmpty">Nothing saved yet — tap the star on any program card to add it here.</p>
+  </section>
+
+  <!-- ============ PARTNERSHIP + QUOTE WIDGET ============ -->
+  <section class="partnership" id="partnership">
+    <div class="partnership-grid">
+      <div class="partnership-copy">
+        <p class="eyebrow">International Partnership</p>
+        <h2>Built with the Technical University of Munich</h2>
+        <p>
+          KIU's curricula, governance model and quality standards are developed jointly with TUM and
+          TUM International GmbH — one of Europe's leading technical universities. Many of KIU's international
+          faculty come from Germany as part of this partnership, and TUM's former president,
+          Prof. Dr. Wolfgang A. Herrmann, holds the role of KIU's honorary president.
+        </p>
+        <p>
+          The campus itself sits about 25&nbsp;km from Kutaisi International Airport and roughly a
+          three-hour drive from Tbilisi — close enough to the capital, remote enough to be its own quiet
+          research community by the river.
+        </p>
+      </div>
+
+      <div class="quote-card">
+        <p class="quote-kicker">Daily inspiration</p>
+        <p class="quote-text" id="quoteText">Loading today's quote…</p>
+        <p class="quote-author" id="quoteAuthor">&nbsp;</p>
+        <button class="btn btn-outline btn-small" id="quoteRefresh">New quote</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="brand-mark">KIU</span>
+      
+      <p>Kutaisi International University<br>Akhalgazrdoba Ave. Lane 5/7, Kutaisi, 4600, Georgia</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <p><a href="mailto:info@kiu.edu.ge">info@kiu.edu.ge</a></p>
+      <p><a href="mailto:international@kiu.edu.ge">international@kiu.edu.ge</a></p>
+      <p>(+995) 577 477 197</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Elsewhere</h4>
+      <p><a href="https://www.kiu.edu.ge/" target="_blank" rel="noopener">Official site ↗</a></p>
+      <p><a href="https://www.facebook.com/KutaisiInternationalUniversity/" target="_blank" rel="noopener">Facebook ↗</a></p>
+      <p><a href="https://www.youtube.com/@KutaisiInternationalUniversity" target="_blank" rel="noopener">YouTube ↗</a></p>
+    </div>
+
+
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
