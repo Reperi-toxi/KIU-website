@@ -12,12 +12,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="styles.css">
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('kiu_theme');
+      var theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    } catch (err) { /* localStorage unavailable — default to day mode */ }
+  })();
+</script>
 </head>
 <body>
 
 <!-- ============ DEMO BANNER ============ -->
 <div class="demo-banner">
-  This is an unofficial student coding project about KIU — not affiliated with the university. Forms and data stay in your browser. Visit the
+  This is a student coding project about KIU. Visit the
   <a href="https://www.kiu.edu.ge/" target="_blank" rel="noopener">official KIU site</a>.
 </div>
 
@@ -37,6 +46,25 @@
       <a href="#favorites">My&nbsp;List <span class="nav-badge" id="favCount">0</span></a>
       <a href="#partnership">Partners</a>
     </nav>
+
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to night mode" aria-pressed="false" title="Toggle day / night mode">
+      <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.2"></circle>
+        <g stroke-linecap="round">
+          <line x1="12" y1="2.5" x2="12" y2="5"></line>
+          <line x1="12" y1="19" x2="12" y2="21.5"></line>
+          <line x1="4.2" y1="4.2" x2="5.9" y2="5.9"></line>
+          <line x1="18.1" y1="18.1" x2="19.8" y2="19.8"></line>
+          <line x1="2.5" y1="12" x2="5" y2="12"></line>
+          <line x1="19" y1="12" x2="21.5" y2="12"></line>
+          <line x1="4.2" y1="19.8" x2="5.9" y2="18.1"></line>
+          <line x1="18.1" y1="5.9" x2="19.8" y2="4.2"></line>
+        </g>
+      </svg>
+      <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M20.2 14.3A8.4 8.4 0 1 1 9.7 3.8a6.6 6.6 0 0 0 10.5 10.5Z"></path>
+      </svg>
+    </button>
 
     <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
       <span></span><span></span><span></span>
@@ -119,8 +147,8 @@
     <div class="section-head">
       <p class="eyebrow">Academic Offer</p>
       <h2>Schools &amp; Programs</h2>
-      <p>Loaded live from KIU's program catalogue (JSON). Search, filter by school, and save the ones you're
-        considering — your list is kept on this device.</p>
+      <p>Find your path. Filter our program catalog by academic school, 
+        search by keyword, and build your personalized list of preferred degrees.</p>
     </div>
 
     <div class="programs-controls">

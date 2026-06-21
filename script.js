@@ -8,6 +8,7 @@ const STORAGE_KEYS = {
   applications: 'kiu_applications',
   visits: 'kiu_visit_count',
   lastFilter: 'kiu_last_filter',
+  theme: 'kiu_theme',
 };
 
 // Real external services — no API key required.
@@ -62,6 +63,7 @@ const elements = {
   navToggle: $('#navToggle'),
   navLinks: $('#navLinks'),
   favCount: $('#favCount'),
+  themeToggle: $('#themeToggle'),
 
   pulseClock: $('#pulseClock'),
   pulseWeather: $('#pulseWeather'),
@@ -147,6 +149,34 @@ const writeStorageAsync = (key, value) =>
 
 const getFavorites = () => readStorage(STORAGE_KEYS.favorites, []);
 const getApplications = () => readStorage(STORAGE_KEYS.applications, []);
+
+/* =====================================================================
+   3b. DAY / NIGHT MODE
+   The actual theme class is applied as early as possible by an inline
+   script in <head> (to avoid a flash of the wrong theme). This module
+   just keeps the toggle button in sync and persists the user's choice.
+   ===================================================================== */
+const applyTheme = (theme) => {
+  const isDark = theme === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  if (elements.themeToggle) {
+    elements.themeToggle.setAttribute('aria-pressed', String(isDark));
+    elements.themeToggle.setAttribute('aria-label', isDark ? 'Switch to day mode' : 'Switch to night mode');
+    elements.themeToggle.setAttribute('title', isDark ? 'Switch to day mode' : 'Switch to night mode');
+  }
+};
+
+const getCurrentTheme = () => (document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light');
+
+const toggleTheme = () => {
+  const next = getCurrentTheme() === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  try {
+    localStorage.setItem(STORAGE_KEYS.theme, next);
+  } catch (err) {
+    console.warn('Could not persist theme preference:', err);
+  }
+};
 
 /* =====================================================================
    4. CALLBACK-STYLE HELPER
@@ -443,6 +473,8 @@ elements.applicationsList.addEventListener('click', async (event) => {
 
 elements.quoteRefresh.addEventListener('click', loadDailyQuote);
 
+elements.themeToggle.addEventListener('click', toggleTheme);
+
 elements.navToggle.addEventListener('click', () => {
   const isOpen = elements.navLinks.classList.toggle('is-open');
   elements.navToggle.setAttribute('aria-expanded', String(isOpen));
@@ -462,6 +494,7 @@ window.addEventListener('scroll', () => {
    13. INIT — orchestrates everything with async/await
    ===================================================================== */
 const init = async () => {
+  applyTheme(getCurrentTheme());
   trackVisit();
   updateClock();
   setInterval(updateClock, 1000);
