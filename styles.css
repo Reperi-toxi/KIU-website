@@ -442,6 +442,58 @@ input, select, textarea{ font-family: inherit; font-size: 1rem; }
 .timeline-body p{ font-size: 0.92rem; }
 
 /* =========================================================
+   ACADEMIC CALENDAR
+   ========================================================= */
+.calendar-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.calendar-card{
+  background: var(--white);
+  border: 1px solid var(--gray-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+.calendar-semester{
+  margin: 0;
+  padding: 18px 22px;
+  background: var(--navy);
+  color: var(--white);
+  font-size: 1.05rem;
+}
+.calendar-table{
+  width: 100%;
+  border-collapse: collapse;
+}
+.calendar-table tr{ border-bottom: 1px solid var(--gray-border); }
+.calendar-table tr:last-child{ border-bottom: none; }
+.calendar-table th{
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--charcoal);
+  padding: 14px 22px;
+  width: 62%;
+}
+.calendar-table td{
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--light-blue);
+  font-weight: 600;
+  padding: 14px 22px;
+  white-space: nowrap;
+}
+.calendar-note{
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--gray);
+  margin-top: 22px;
+}
+
+/* =========================================================
    ADMISSION
    ========================================================= */
 .admission-grid{
@@ -585,6 +637,7 @@ input, select, textarea{ font-family: inherit; font-size: 1rem; }
   .stats-band{ grid-template-columns: repeat(2, 1fr); row-gap: 24px; }
   .stat:nth-child(2){ border-right: none; }
   .admission-grid, .partnership-grid{ grid-template-columns: 1fr; }
+  .calendar-grid{ grid-template-columns: 1fr; }
   .footer-grid{ grid-template-columns: 1fr 1fr; }
 }
 
@@ -606,7 +659,7 @@ input, select, textarea{ font-family: inherit; font-size: 1rem; }
   .admission-form{ grid-template-columns: 1fr; }
   .footer-grid{ grid-template-columns: 1fr; }
 }
-
 @media (max-width: 480px){
   .stats-band{ grid-template-columns: 1fr 1fr; }
+  .calendar-table th, .calendar-table td{ padding: 12px 16px; font-size: 0.78rem; }
 }
