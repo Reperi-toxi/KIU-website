@@ -9,6 +9,9 @@ const STORAGE_KEYS = {
   visits: 'kiu_visit_count',
   lastFilter: 'kiu_last_filter',
   theme: 'kiu_theme',
+  // sessionStorage key — weather is cached for the current tab session only
+  // so we don't re-fetch on every page interaction within the same visit.
+  weatherCache: 'kiu_weather_cache',
 };
 
 // Real external services — no API key required.
@@ -211,13 +214,33 @@ const showNextFact = () => {
 
 /* =====================================================================
    5. ASYNC/AWAIT + FETCH — live campus weather (Open-Meteo)
+   Weather data is cached in sessionStorage for the duration of the tab
+   session. This avoids a redundant network request on every page load
+   within the same visit, while still fetching fresh data in a new tab.
+   sessionStorage is used here (rather than localStorage) deliberately:
+   weather is only meaningful in the short term and should not persist
+   across sessions.
    ===================================================================== */
 async function loadCampusWeather() {
   try {
+    // Check sessionStorage for a cached result from earlier in this session.
+    const cached = sessionStorage.getItem(STORAGE_KEYS.weatherCache);
+    if (cached) {
+      const { temperature, weathercode } = JSON.parse(cached);
+      const condition = WEATHER_CODES[weathercode] ?? 'Mixed conditions';
+      elements.pulseWeather.textContent = `${temperature}°C · ${condition} (cached)`;
+      return;
+    }
+
     const response = await fetch(WEATHER_API);
     if (!response.ok) throw new Error(`Weather request failed (${response.status})`);
     const data = await response.json();
     const { temperature, weathercode } = data.current_weather;
+
+    // Persist the result to sessionStorage so subsequent calls this session
+    // skip the network round-trip entirely.
+    sessionStorage.setItem(STORAGE_KEYS.weatherCache, JSON.stringify({ temperature, weathercode }));
+
     const condition = WEATHER_CODES[weathercode] ?? 'Mixed conditions';
     elements.pulseWeather.textContent = `${temperature}°C · ${condition}`;
   } catch (err) {
