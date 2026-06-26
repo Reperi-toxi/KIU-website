@@ -9,15 +9,29 @@ const STORAGE_KEYS = {
   visits: 'kiu_visit_count',
   lastFilter: 'kiu_last_filter',
   theme: 'kiu_theme',
-  // sessionStorage key — weather is cached for the current tab session only
-  // so we don't re-fetch on every page interaction within the same visit.
-  weatherCache: 'kiu_weather_cache',
 };
 
 // Real external services — no API key required.
 const WEATHER_API =
   'https://api.open-meteo.com/v1/forecast?latitude=42.2679&longitude=42.6946&current_weather=true&timezone=Asia%2FTbilisi';
-const QUOTE_API = 'https://dummyjson.com/quotes/random';
+// Curated education & science quotes — no external dependency needed.
+const EDUCATION_QUOTES = [
+  { quote: 'The purpose of education is to replace an empty mind with an open one.', author: 'Malcolm Forbes' },
+  { quote: 'Education is the most powerful weapon which you can use to change the world.', author: 'Nelson Mandela' },
+  { quote: 'The more that you read, the more things you will know. The more that you learn, the more places you\'ll go.', author: 'Dr. Seuss' },
+  { quote: 'An investment in knowledge pays the best interest.', author: 'Benjamin Franklin' },
+  { quote: 'The beautiful thing about learning is that nobody can take it away from you.', author: 'B.B. King' },
+  { quote: 'Education is not the filling of a pail, but the lighting of a fire.', author: 'W.B. Yeats' },
+  { quote: 'Live as if you were to die tomorrow. Learn as if you were to live forever.', author: 'Mahatma Gandhi' },
+  { quote: 'The mind is not a vessel to be filled, but a fire to be ignited.', author: 'Plutarch' },
+  { quote: 'Science is not only a disciple of reason but, also, one of romance and passion.', author: 'Stephen Hawking' },
+  { quote: 'Equipped with his five senses, man explores the universe around him and calls the adventure Science.', author: 'Edwin Hubble' },
+  { quote: 'Research is to see what everybody else has seen, and to think what nobody else has thought.', author: 'Albert Szent-Györgyi' },
+  { quote: 'The roots of education are bitter, but the fruit is sweet.', author: 'Aristotle' },
+  { quote: 'Somewhere, something incredible is waiting to be known.', author: 'Carl Sagan' },
+  { quote: 'Intelligence plus character — that is the goal of true education.', author: 'Martin Luther King Jr.' },
+  { quote: 'Hic Scientia Futūrum Creat — where knowledge creates the future.', author: 'KIU Motto' },
+];
 const PROGRAMS_JSON_PATH = 'programs.json';
 
 const CAMPUS_FACTS = [
@@ -44,10 +58,6 @@ const FALLBACK_PROGRAMS = [
   { id: 'med', name: 'Medicine', school: 'Medicine', degree: 'Single-Cycle Program', duration: '6 years', language: 'English / Georgian', tagline: "A clinical and research track supported by KIU's hadron-therapy centre." },
 ];
 
-const FALLBACK_QUOTES = [
-  { quote: 'Hic Scientia Futūrum Creat — knowledge creates the future.', author: 'KIU motto' },
-  { quote: 'A university is judged by the company its ideas keep.', author: 'Unknown' },
-];
 
 const WEATHER_CODES = {
   0: 'Clear sky', 1: 'Mostly clear', 2: 'Partly cloudy', 3: 'Overcast',
@@ -214,33 +224,13 @@ const showNextFact = () => {
 
 /* =====================================================================
    5. ASYNC/AWAIT + FETCH — live campus weather (Open-Meteo)
-   Weather data is cached in sessionStorage for the duration of the tab
-   session. This avoids a redundant network request on every page load
-   within the same visit, while still fetching fresh data in a new tab.
-   sessionStorage is used here (rather than localStorage) deliberately:
-   weather is only meaningful in the short term and should not persist
-   across sessions.
    ===================================================================== */
 async function loadCampusWeather() {
   try {
-    // Check sessionStorage for a cached result from earlier in this session.
-    const cached = sessionStorage.getItem(STORAGE_KEYS.weatherCache);
-    if (cached) {
-      const { temperature, weathercode } = JSON.parse(cached);
-      const condition = WEATHER_CODES[weathercode] ?? 'Mixed conditions';
-      elements.pulseWeather.textContent = `${temperature}°C · ${condition} (cached)`;
-      return;
-    }
-
     const response = await fetch(WEATHER_API);
     if (!response.ok) throw new Error(`Weather request failed (${response.status})`);
     const data = await response.json();
     const { temperature, weathercode } = data.current_weather;
-
-    // Persist the result to sessionStorage so subsequent calls this session
-    // skip the network round-trip entirely.
-    sessionStorage.setItem(STORAGE_KEYS.weatherCache, JSON.stringify({ temperature, weathercode }));
-
     const condition = WEATHER_CODES[weathercode] ?? 'Mixed conditions';
     elements.pulseWeather.textContent = `${temperature}°C · ${condition}`;
   } catch (err) {
@@ -251,24 +241,24 @@ async function loadCampusWeather() {
 }
 
 /* =====================================================================
-   6. ASYNC/AWAIT + FETCH — daily quote (DummyJSON)
+   6. QUOTE ROTATION — curated local array, no external dependency.
+   Picks a deterministic quote based on the day of the year so the
+   "daily" feel is preserved (same quote all day, new one each day),
+   and the Refresh button steps forward through the list.
    ===================================================================== */
-async function loadDailyQuote() {
-  elements.quoteText.textContent = 'Loading today\u2019s quote\u2026';
-  elements.quoteAuthor.textContent = '\u00A0';
-  try {
-    const response = await fetch(QUOTE_API);
-    if (!response.ok) throw new Error('Quote service unavailable');
-    const { quote, author } = await response.json();
-    elements.quoteText.textContent = `\u201C${quote}\u201D`;
-    elements.quoteAuthor.textContent = `\u2014 ${author}`;
-  } catch (err) {
-    console.warn('Quote fetch failed, using a bundled fallback:', err);
-    const [fallback] = FALLBACK_QUOTES;
-    const { quote, author } = fallback;
-    elements.quoteText.textContent = `\u201C${quote}\u201D`;
-    elements.quoteAuthor.textContent = `\u2014 ${author}`;
-  }
+let quoteIndex = (() => {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const diff = now - start;
+  const oneDay = 1000 * 60 * 60 * 24;
+  return Math.floor(diff / oneDay) % EDUCATION_QUOTES.length;
+})();
+
+function loadDailyQuote() {
+  const { quote, author } = EDUCATION_QUOTES[quoteIndex % EDUCATION_QUOTES.length];
+  quoteIndex += 1;
+  elements.quoteText.textContent = `\u201C${quote}\u201D`;
+  elements.quoteAuthor.textContent = `\u2014 ${author}`;
 }
 
 /* =====================================================================
