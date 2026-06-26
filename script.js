@@ -510,7 +510,7 @@ window.addEventListener('scroll', () => {
    ===================================================================== */
 const GALLERY_SLIDES = [
   {
-    src: 'https://tum-international.com/wp-content/uploads/2023/04/KIU_bunte_Gebaeuderiegel_schmal.jpg',
+    src: 'https://studenthelp.ro/assets/uploads/universities/74/314f53732a05e470bc101da203adb3d2.jpg',
     alt: 'Aerial view of the full KIU campus grounds',
     heading: 'A Campus Built for Discovery',
     description: '150 hectares of forested land along the Rioni river — KIU\'s campus was designed from scratch as a purpose-built academic and research community, located ~25\u00A0km from Kutaisi city.',
@@ -580,7 +580,7 @@ const initGallery = () => {
     dotsWrap.appendChild(dot);
   });
 
-  const goTo = (index, direction = 'next') => {
+  const goTo = (index) => {
     const next = (index + galleryState.total) % galleryState.total;
     if (next === galleryState.current) return;
 
@@ -602,45 +602,47 @@ const initGallery = () => {
     });
 
     galleryState.current = next;
-    resetProgress();
   };
 
   const resetProgress = () => {
     const bar = $('#galleryProgress');
     if (!bar) return;
-    // Reset instantly, then animate across the interval
     bar.style.transition = 'none';
     bar.style.width = '0%';
-    // Force reflow so the reset takes effect before we re-apply the transition
+    // Force reflow so the instant reset paints before the animation begins
     void bar.offsetWidth;
     bar.style.transition = `width ${GALLERY_INTERVAL}ms linear`;
     bar.style.width = '100%';
   };
 
+  // Always stop before starting — prevents stacking intervals on hover resume
+  const stopAuto = () => {
+    clearInterval(galleryState.timer);
+    galleryState.timer = null;
+  };
+
   const startAuto = () => {
+    stopAuto(); // guarantee only one interval is ever running
+    resetProgress();
     galleryState.timer = setInterval(() => {
       goTo(galleryState.current + 1);
+      resetProgress();
     }, GALLERY_INTERVAL);
   };
 
-  const stopAuto = () => {
-    clearInterval(galleryState.timer);
-  };
-
-  // Arrow buttons
-  prevBtn.addEventListener('click', () => { stopAuto(); goTo(galleryState.current - 1); startAuto(); });
-  nextBtn.addEventListener('click', () => { stopAuto(); goTo(galleryState.current + 1); startAuto(); });
+  // Arrow buttons — navigate then restart the auto-advance cycle cleanly
+  prevBtn.addEventListener('click', () => { goTo(galleryState.current - 1); startAuto(); });
+  nextBtn.addEventListener('click', () => { goTo(galleryState.current + 1); startAuto(); });
 
   // Dot buttons
   dotsWrap.addEventListener('click', (e) => {
     const dot = e.target.closest('.gallery-dot');
     if (!dot) return;
-    stopAuto();
     goTo(Number(dot.dataset.index));
     startAuto();
   });
 
-  // Pause on hover
+  // Pause on hover — stopAuto/startAuto are now safe to call repeatedly
   const viewport = track.parentElement;
   viewport.addEventListener('mouseenter', stopAuto);
   viewport.addEventListener('mouseleave', startAuto);
@@ -650,7 +652,6 @@ const initGallery = () => {
   sub.textContent     = GALLERY_SLIDES[0].description;
 
   // Kick everything off
-  resetProgress();
   startAuto();
 };
 
