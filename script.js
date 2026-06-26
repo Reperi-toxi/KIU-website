@@ -504,8 +504,157 @@ window.addEventListener('scroll', () => {
 });
 
 /* =====================================================================
-   13. INIT — orchestrates everything with async/await
+   14. CAMPUS GALLERY SLIDESHOW
+   Three real KIU campus photos with auto-advance, manual prev/next,
+   dot indicators, a progress bar, and synced left-panel descriptions.
    ===================================================================== */
+const GALLERY_SLIDES = [
+  {
+    src: 'https://tum-international.com/wp-content/uploads/2023/04/KIU_bunte_Gebaeuderiegel_schmal.jpg',
+    alt: 'Aerial view of the full KIU campus grounds',
+    heading: 'A Campus Built for Discovery',
+    description: '150 hectares of forested land along the Rioni river — KIU\'s campus was designed from scratch as a purpose-built academic and research community, located ~25\u00A0km from Kutaisi city.',
+  },
+  {
+    src: 'https://keystoneacademic-res.cloudinary.com/image/upload/element/17/178205_122814002_101031178482275_5380330633712281683_n.jpg',
+    alt: 'Main academic building K at Kutaisi International University',
+    heading: 'Academic Building K',
+    description: 'The primary academic hub at KIU, where lectures, seminars and collaborative projects bring together students from Engineering, Business, Design, Law and Medicine.',
+  },
+  {
+    src: 'https://i.redd.it/kutaisi-international-university-v0-v0pwm6n0jzhf1.jpg?width=800&format=pjpg&auto=webp&s=ec04d9e238de276319edf50b40cfb5aa5b333f1e',
+    alt: 'Academic building A at Kutaisi International University',
+    heading: 'Academic Building A',
+    description: 'Building A houses specialised labs and faculty offices. Together with Building K, it anchors the pedestrian core of the campus — designed for chance encounters and cross-disciplinary thinking.',
+  },
+];
+
+const GALLERY_INTERVAL = 5000; // ms between auto-advances
+
+const galleryState = {
+  current: 0,
+  total: GALLERY_SLIDES.length,
+  timer: null,
+  progressTimer: null,
+};
+
+const initGallery = () => {
+  const track      = $('#galleryTrack');
+  const dotsWrap   = $('#galleryDots');
+  const heading    = $('#galleryHeading');
+  const sub        = $('#gallerySub');
+  const label      = $('#galleryLabel');
+  const prevBtn    = $('#galleryPrev');
+  const nextBtn    = $('#galleryNext');
+
+  if (!track) return; // section not present
+
+  // Build slides
+  GALLERY_SLIDES.forEach(({ src, alt }, i) => {
+    const slide = document.createElement('div');
+    slide.className = 'gallery-slide';
+    slide.setAttribute('role', 'tabpanel');
+    slide.setAttribute('aria-label', `Slide ${i + 1} of ${GALLERY_SLIDES.length}`);
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = alt;
+    img.loading = i === 0 ? 'eager' : 'lazy';
+    slide.appendChild(img);
+    track.appendChild(slide);
+  });
+
+  // Build progress bar
+  const progress = document.createElement('div');
+  progress.className = 'gallery-progress';
+  progress.id = 'galleryProgress';
+  track.parentElement.appendChild(progress);
+
+  // Build dots
+  GALLERY_SLIDES.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'gallery-dot' + (i === 0 ? ' is-active' : '');
+    dot.setAttribute('role', 'tab');
+    dot.setAttribute('aria-selected', String(i === 0));
+    dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+    dot.dataset.index = i;
+    dotsWrap.appendChild(dot);
+  });
+
+  const goTo = (index, direction = 'next') => {
+    const next = (index + galleryState.total) % galleryState.total;
+    if (next === galleryState.current) return;
+
+    // Slide the track
+    track.style.transform = `translateX(-${next * 100}%)`;
+
+    // Fade out text, swap, fade in
+    label.classList.add('is-transitioning');
+    setTimeout(() => {
+      heading.textContent = GALLERY_SLIDES[next].heading;
+      sub.textContent     = GALLERY_SLIDES[next].description;
+      label.classList.remove('is-transitioning');
+    }, 350);
+
+    // Update dots
+    $$('.gallery-dot', dotsWrap).forEach((d, i) => {
+      d.classList.toggle('is-active', i === next);
+      d.setAttribute('aria-selected', String(i === next));
+    });
+
+    galleryState.current = next;
+    resetProgress();
+  };
+
+  const resetProgress = () => {
+    const bar = $('#galleryProgress');
+    if (!bar) return;
+    // Reset instantly, then animate across the interval
+    bar.style.transition = 'none';
+    bar.style.width = '0%';
+    // Force reflow so the reset takes effect before we re-apply the transition
+    void bar.offsetWidth;
+    bar.style.transition = `width ${GALLERY_INTERVAL}ms linear`;
+    bar.style.width = '100%';
+  };
+
+  const startAuto = () => {
+    galleryState.timer = setInterval(() => {
+      goTo(galleryState.current + 1);
+    }, GALLERY_INTERVAL);
+  };
+
+  const stopAuto = () => {
+    clearInterval(galleryState.timer);
+  };
+
+  // Arrow buttons
+  prevBtn.addEventListener('click', () => { stopAuto(); goTo(galleryState.current - 1); startAuto(); });
+  nextBtn.addEventListener('click', () => { stopAuto(); goTo(galleryState.current + 1); startAuto(); });
+
+  // Dot buttons
+  dotsWrap.addEventListener('click', (e) => {
+    const dot = e.target.closest('.gallery-dot');
+    if (!dot) return;
+    stopAuto();
+    goTo(Number(dot.dataset.index));
+    startAuto();
+  });
+
+  // Pause on hover
+  const viewport = track.parentElement;
+  viewport.addEventListener('mouseenter', stopAuto);
+  viewport.addEventListener('mouseleave', startAuto);
+
+  // Seed the first description
+  heading.textContent = GALLERY_SLIDES[0].heading;
+  sub.textContent     = GALLERY_SLIDES[0].description;
+
+  // Kick everything off
+  resetProgress();
+  startAuto();
+};
+
+
 const init = async () => {
   applyTheme(getCurrentTheme());
   trackVisit();
@@ -517,6 +666,8 @@ const init = async () => {
   // These two external calls run independently of the program catalogue.
   loadCampusWeather();
   loadDailyQuote();
+
+  initGallery();
 
   state.programs = await loadPrograms();
 
