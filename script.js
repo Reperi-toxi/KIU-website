@@ -223,21 +223,26 @@ const showNextFact = () => {
 };
 
 /* =====================================================================
-   5. ASYNC/AWAIT + FETCH — live campus weather (Open-Meteo)
+   5. PROMISE CHAIN (.then / .catch) + FETCH — live campus weather
+   Intentionally written as a .then().catch() chain (not async/await)
+   to demonstrate the classic Promise consumption style alongside the
+   async/await approach used elsewhere in this file.
    ===================================================================== */
-async function loadCampusWeather() {
-  try {
-    const response = await fetch(WEATHER_API);
-    if (!response.ok) throw new Error(`Weather request failed (${response.status})`);
-    const data = await response.json();
-    const { temperature, weathercode } = data.current_weather;
-    const condition = WEATHER_CODES[weathercode] ?? 'Mixed conditions';
-    elements.pulseWeather.textContent = `${temperature}°C · ${condition}`;
-  } catch (err) {
-    console.warn('Weather unavailable:', err);
-    elements.pulseWeather.textContent = 'unavailable right now';
-    elements.pulseDot.classList.add('is-offline');
-  }
+function loadCampusWeather() {
+  fetch(WEATHER_API)
+    .then((response) => {
+      if (!response.ok) throw new Error(`Weather request failed (${response.status})`);
+      return response.json();
+    })
+    .then(({ current_weather: { temperature, weathercode } }) => {
+      const condition = WEATHER_CODES[weathercode] ?? 'Mixed conditions';
+      elements.pulseWeather.textContent = `${temperature}°C · ${condition}`;
+    })
+    .catch((err) => {
+      console.warn('Weather unavailable:', err);
+      elements.pulseWeather.textContent = 'unavailable right now';
+      elements.pulseDot.classList.add('is-offline');
+    });
 }
 
 /* =====================================================================
@@ -476,12 +481,14 @@ elements.filterChips.addEventListener('click', (event) => {
 
 elements.admissionForm.addEventListener('submit', handleAdmissionSubmit);
 
-elements.applicationsList.addEventListener('click', async (event) => {
+// .then()/.catch() consumption style — contrasts with the async/await handlers above.
+elements.applicationsList.addEventListener('click', (event) => {
   const removeBtn = event.target.closest('[data-remove]');
   if (!removeBtn) return;
   const remaining = getApplications().filter(({ id }) => id !== removeBtn.dataset.remove);
-  await writeStorageAsync(STORAGE_KEYS.applications, remaining);
-  renderApplications();
+  writeStorageAsync(STORAGE_KEYS.applications, remaining)
+    .then(() => renderApplications())
+    .catch((err) => console.warn('Could not remove application:', err));
 });
 
 elements.quoteRefresh.addEventListener('click', loadDailyQuote);
@@ -544,8 +551,6 @@ const initGallery = () => {
   const heading    = $('#galleryHeading');
   const sub        = $('#gallerySub');
   const label      = $('#galleryLabel');
-  const prevBtn    = $('#galleryPrev');
-  const nextBtn    = $('#galleryNext');
 
   if (!track) return; // section not present
 
@@ -616,36 +621,14 @@ const initGallery = () => {
   };
 
   // Always stop before starting — prevents stacking intervals on hover resume
-  const stopAuto = () => {
-    clearInterval(galleryState.timer);
-    galleryState.timer = null;
-  };
-
   const startAuto = () => {
-    stopAuto(); // guarantee only one interval is ever running
+    clearInterval(galleryState.timer); // ensure only one interval runs
     resetProgress();
     galleryState.timer = setInterval(() => {
       goTo(galleryState.current + 1);
       resetProgress();
     }, GALLERY_INTERVAL);
   };
-
-  // Arrow buttons — navigate then restart the auto-advance cycle cleanly
-  prevBtn.addEventListener('click', () => { goTo(galleryState.current - 1); startAuto(); });
-  nextBtn.addEventListener('click', () => { goTo(galleryState.current + 1); startAuto(); });
-
-  // Dot buttons
-  dotsWrap.addEventListener('click', (e) => {
-    const dot = e.target.closest('.gallery-dot');
-    if (!dot) return;
-    goTo(Number(dot.dataset.index));
-    startAuto();
-  });
-
-  // Pause on hover — stopAuto/startAuto are now safe to call repeatedly
-  const viewport = track.parentElement;
-  viewport.addEventListener('mouseenter', stopAuto);
-  viewport.addEventListener('mouseleave', startAuto);
 
   // Seed the first description
   heading.textContent = GALLERY_SLIDES[0].heading;
